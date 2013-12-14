@@ -269,7 +269,7 @@ int external( int argc, char **argv) {
 	}
 	else {
 		if (status != 0) {
-			printf("Status is: %d\n",status);
+			printf("command status: %d\n",status);
 		}
 		
 		return status;
