@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 		int tok = tokenize(line, tokens);
 		
 		
-		if (tok >=0) {
+		if (tok >0) {
 			//Internal command: quit
 			if (strcmp(tokens[0], "quit") == 0) {
 				for (int i=0; i<tok; i++) {
@@ -144,18 +144,25 @@ int tokenize(char *line, char *tokens[]) {
 			char *substring;
 			substring = malloc(stop + 1);
 			strncpy(substring, line+pos, stop);
+			substring[stop] = '\0';
+
+			
 			char *token;
-			token = strtok (substring," \n");
+			token = strtok(substring," \n");
 			while (token != NULL) {
 				tokens[count] = malloc(strlen(token) + 1);
 				token[strlen(token)] = '\0';
-				strcpy(tokens[count], token);
+
+				tokens[count] = strdup(token);
 				count++;
+				
 				token = strtok (NULL, " \n");
 			}
 			
+			
 			free(substring);
 			pos += stop;
+
 			nextQuote = -1;
 			nextApos = -1;
 					
@@ -209,7 +216,6 @@ int tokenize(char *line, char *tokens[]) {
 			strcpy(tokens[count], substring);
 			count++;
 			pos = pos+stop + 1;
-			printf("Pos is %d\n",pos);
 			
 			free(substring);
 			nextQuote = -1;
@@ -220,6 +226,5 @@ int tokenize(char *line, char *tokens[]) {
 		
 				
 	}
-		
 	return count;
 }
