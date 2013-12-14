@@ -26,6 +26,13 @@ int main(int argc, char *argv[]) {
 		
 		
 		if (tok >0) {
+			
+			//Update the command history
+			commandHistory[count] = malloc(strlen(line)+1);
+			strcpy(commandHistory[count],line);
+			count++;
+			
+			
 			//Internal command: quit
 			if (strcmp(tokens[0], "quit") == 0) {
 				quit(tok,tokens);
@@ -71,10 +78,6 @@ int main(int argc, char *argv[]) {
 				free(tokens[i]);
 			}
 			
-			//Update the command history
-			commandHistory[count] = malloc(strlen(line)+1);
-			strcpy(commandHistory[count],line);
-			count++;
 		}
 
 	}
@@ -317,9 +320,8 @@ int verbose( int argc, char **argv ) {
 //param argv: tokens parsed (unused)
 //return int: unused, but the spec requires it
 int history( int argc, char **argv ) {
-	printf("Command History\n");
 	for (int i = 0; i<count; i++) {
-		printf("\t mish[%d] > %s",i, commandHistory[i]);
+		printf("\t%d: %s",i+1, commandHistory[i]);
 	}
 	
 	return 0;
