@@ -18,11 +18,23 @@ int main(int argc, char *argv[]) {
 		
 		char *tokens[bytesRead];
 		
-		int i = tokenize(line, tokens);
-		printf("%s\n", tokens[1]);
+		int tok = tokenize(line, tokens);
 		
-		if (strcmp(line, "quit\n") == 0) {
+		if (strcmp(tokens[0], "quit") == 0) {
+			for (int i=0; i<tok; i++) {
+				free(tokens[i]);
+			}
 			break;
+		}
+		
+		
+		for (int i=0; i<tok; i++) {
+			printf("%s\n",tokens[i]);
+		}
+		
+		
+		for (int i=0; i<tok; i++) {
+			free(tokens[i]);
 		}
 		
 		printf("%s",line);
@@ -46,75 +58,112 @@ int tokenize(char *line, char *tokens[]) {
 	int nextQuote = -1;
 	int nextApos = -1;
 	int count = 0;
-	bool apos = false;
-	bool quote = false;
+
 
 	
-	while (pos < len -1) {
-		char *nQuote = strchr(line + pos, '\"');
-		if (nQuote) {
-			nextQuote = (int)(nQuote - line + pos);
-		}
+	while (pos < len) {
 		
-		char *nApos = strchr(line + pos, '\'');
-		if (nApos) {
-			nextApos = (int)(nApos - line + pos);
-		}
+		//printf("Working on string from %d to %d\n",pos, len);
 		
-		int stop = len;
-		if (nextQuote >= 0 && (nextQuote < nextApos || nextApos < 0)) {
-			quote = true;
-			apos = false;
-			stop = nextQuote;
-		}
-		
-		else if (nextApos >= 0 && (nextApos < nextQuote || nextQuote < 0)) {
-			quote = false;
-			apos = true;
-			stop = nextApos;
-		} 
-		char *substring;
-		substring = malloc(stop + 1);
-		strncpy(substring, line+pos, stop);
-		
-		char *token;
-		token = strtok (substring," ");
-		while (token != NULL) {
-			//printf ("%s\n",token);
-			tokens[count] = malloc(sizeof(token));
-			//printf("Hello2\n");
-			strcpy(tokens[count], token);
-			//printf("Hello3\n");
-			count++;
-			pos+=strlen(token + 1);
-			token = strtok (NULL, " ");
-		}
-		printf("stop is %d\n",stop);
-		//pos = stop;
-		//Free the substring before reusing it
-		free(substring);
-		substring = malloc(len + 1);
-		strncpy(substring, line+pos + 1, len+1);
-		printf("Substring is %s\n",substring);
-	
-		
-		if (quote) {
-			nQuote = strchr(substring, '\"');
+		if (line[pos] != '\"' && line[pos] !='\'') {
+			
+			char *nQuote = strchr(line + pos, '\"');
 			if (nQuote) {
-				nextQuote = (int)(nQuote - substring);
-				printf("Next Quote %d\n",nextQuote);
-				tokens[count] = malloc(nextQuote + 1);
-				strncpy(tokens[count],substring, nextQuote);
-				count++;
+				nextQuote = (int)(nQuote - (line + pos));
 				
-				//+2 because of the start and end quotes
-				pos += nextQuote + 2;
-				
-				printf("Position is %d and len is %d\n",pos, len);
 			}
+
+			
+			char *nApos = strchr(line + pos, '\'');
+			if (nApos) {
+				nextApos = (int)(nApos - (line + pos));
+			}
+			
+
+			int stop = len;
+			
+			if (nextQuote >= 0 && (nextQuote < nextApos || nextApos < 0)) {
+				stop = nextQuote;
+			}
+			
+			else if (nextApos >= 0 && (nextApos < nextQuote || nextQuote < 0)) {
+				stop = nextApos;
+			}
+			char *substring;
+			substring = malloc(stop + 1);
+			strncpy(substring, line+pos, stop);
+			char *token;
+			token = strtok (substring," \n");
+			while (token != NULL) {
+				tokens[count] = malloc(strlen(token) + 1);
+				token[strlen(token)] = '\0';
+				strcpy(tokens[count], token);
+				count++;
+				token = strtok (NULL, " \n");
+			}
+			
+			free(substring);
+			pos += stop;
+			nextQuote = -1;
+			nextApos = -1;
+					
+		
 		}
+		
+		//line[pos] is a double or single quote
+		else {
+			int start = pos + 1;
+			int stop;
+			//Found quote
+			if (line[pos] == '\"') {
+				char *nQuote = strchr(line + pos + 1, '\"');
+				if (nQuote) {
+					nextQuote = (int)(nQuote - (line + pos));
+					stop = nextQuote;
+
+				}
+				
+				else {
+					printf("ERROR: out of quotes\n");
+					return -1;
+				}
+			}
+			//Found single quote
+			else {
+				char *nApos = strchr(line + pos + 1, '\'');
+				if (nApos) {
+					nextApos = (int)(nApos - (line + pos));
+					stop = nextApos;
+
+				}
+				else {
+					printf("ERROR: out of single quotes\n");
+					return -1;
+				}
+			}
+			
+			char *substring;
+			substring = malloc(sizeof(char) * stop);
+			strncpy(substring, line + start,stop-1 );
+			substring[stop-1] = '\0';
+			
+			tokens[count] = malloc(strlen(substring) +1);
+			strcpy(tokens[count], substring);
+			count++;
+			pos = pos+stop + 1;
+			printf("Pos is %d\n",pos);
+			
+			free(substring);
+			nextQuote = -1;
+			nextApos = -1;
+			
+		}
+		
+		
 				
 	}
+	
+	printf("Count is %d\n",count);
 	
 	return count;
 }
