@@ -2,12 +2,15 @@
 
 int main(int argc, char *argv[]) {
 	
+	int count = 0;
 	char *line;
 	size_t maxLine = 1024;
 	line = (char *)malloc( maxLine );
+	char *history[maxLine];
 	int bytesRead = 0;
+	bool verbose = false;
 	while (!feof(stdin)) {
-		
+		printf("mish[%d]> ",count+1);
 		bytesRead = getline(&line, &maxLine, stdin);
 		
 		//Ctrl-d were done
@@ -20,28 +23,77 @@ int main(int argc, char *argv[]) {
 		
 		int tok = tokenize(line, tokens);
 		
-		if (strcmp(tokens[0], "quit") == 0) {
+		
+		if (tok >=0) {
+			//Internal command: quit
+			if (strcmp(tokens[0], "quit") == 0) {
+				for (int i=0; i<tok; i++) {
+					free(tokens[i]);
+				}
+				
+				for (int i=0; i<count; i++) {
+					free(history[i]);
+				}
+				break;
+			}
+			
+			//Internal command: help
+			else if (strcmp(tokens[0],"help") ==0) {
+				printf("verbose on/off: turn the shell verbose on or off.\n");
+				printf("help: print a list of internal commands.\n");
+				printf("history: print a list of commands executed so far, including their arguments.\n");
+				printf("quit: cleans up memory and gracefully terminate mish.\n");
+			}
+			//Internal command: history
+			else if (strcmp(tokens[0],"history") ==0) {
+				printf("Command History\n");
+				for (int i = 0; i<count; i++) {
+					printf("\t mish[%d] > %s",i, history[i]);
+				}
+			}
+			
+			//Internal command: verbose
+			else if (strcmp(tokens[0],"verbose") ==0) {
+				if (strcmp(tokens[1],"on") == 0) {
+					verbose = true;
+				}
+				
+				else if (strcmp(tokens[1],"off") == 0) {
+					verbose = false;
+				}
+				
+				else {
+					perror("Invalid state for verbose\n");
+				}
+				
+			}
+			
+			//External commands
+			else {
+				if (verbose) {
+					printf("\tcommand: %s\n",line);
+					printf("\tinput command tokens:\n");
+					
+					for (int i = 0; i< tok; i++) {
+						printf("\t%d: %s.\n",i,tokens[i]);
+					}
+				}	
+			}
+			
+			
+	
 			for (int i=0; i<tok; i++) {
 				free(tokens[i]);
 			}
-			break;
 		}
-		
-		
-		for (int i=0; i<tok; i++) {
-			printf("%s\n",tokens[i]);
-		}
-		
-		
-		for (int i=0; i<tok; i++) {
-			free(tokens[i]);
-		}
-		
-		printf("%s",line);
+		history[count] = malloc(strlen(line)+1);
+		strcpy(history[count],line);
+		count++;
+
 	}
 	
 	
-	printf("Done\n");
+	printf("Goodbye\n");
 }
 
 //Break the string into tokens while preserving text in single or double quotes
@@ -124,7 +176,10 @@ int tokenize(char *line, char *tokens[]) {
 				}
 				
 				else {
-					printf("ERROR: out of quotes\n");
+					for (int i = 0; i<count; i++) {
+						free(tokens[i]);
+					}
+					perror("ERROR: out of quotes\n");
 					return -1;
 				}
 			}
@@ -137,7 +192,10 @@ int tokenize(char *line, char *tokens[]) {
 
 				}
 				else {
-					printf("ERROR: out of single quotes\n");
+					for (int i = 0; i<count; i++) {
+						free(tokens[i]);
+					}
+					perror("ERROR: out of single quotes\n");
 					return -1;
 				}
 			}
@@ -162,8 +220,6 @@ int tokenize(char *line, char *tokens[]) {
 		
 				
 	}
-	
-	printf("Count is %d\n",count);
-	
+		
 	return count;
 }
