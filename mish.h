@@ -1,6 +1,7 @@
 //Mish.h
 //The header for cs243 project3 mish
 //Author Colin L Murphy clm3888@rit.edu
+//Date: 12/12/13
 //////////////////////////////////////////////////
 
 #define _GNU_SOURCE
@@ -21,4 +22,3 @@ int history( int argc, char ** argv );
 int verbose( int argc, char **argv );
 int quit( int argc, char **argv );
 int external( int argc, char **argv);
-int jobs( int argc, char **argv );

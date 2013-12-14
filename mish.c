@@ -1,9 +1,17 @@
+//Mish.c
+//Implementation of cs243 project 3 mish
+//Description: A basic shell with a few internal commands
+//Date: 12/12/13
+/////////////////////////////////////////////////////////////////
+
+
 #include "mish.h"
 
 char *commandHistory[1024];
 int count = 0;
 bool verb = false;
 
+//Run the loop and run the commands
 int main(int argc, char *argv[]) {
 	
 	size_t maxLine = 1024;
