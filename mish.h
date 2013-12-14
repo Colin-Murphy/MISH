@@ -13,6 +13,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+
+//External function definition, see the implementation for full comments
 int tokenize(char *line, char *tokens[]);
 int help( int argc, char ** argv );
 int history( int argc, char ** argv );
