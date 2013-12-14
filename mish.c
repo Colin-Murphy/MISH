@@ -24,6 +24,8 @@ int main(int argc, char *argv[]) {
 		
 		int tok = tokenize(line, tokens);
 		
+		//printf("ENTERED LINE: %s\n",line);
+		
 		
 		if (tok >0) {
 			
@@ -250,7 +252,7 @@ int external( int argc, char **argv) {
 		execvp( argv[0], argv );
 
 		//print the error
-		perror( "execvp" );
+		perror( argv[0] );
 
 		//give up and exit
 		_exit( EXIT_FAILURE );
