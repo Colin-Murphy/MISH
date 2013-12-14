@@ -21,3 +21,4 @@ int history( int argc, char ** argv );
 int verbose( int argc, char **argv );
 int quit( int argc, char **argv );
 int external( int argc, char **argv);
+int jobs( int argc, char **argv );

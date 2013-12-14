@@ -57,7 +57,8 @@ int main(int argc, char *argv[]) {
 			}
 			
 			//External commands
-			else {
+			//I wont run jobs, becuause I don't like errors in the tests
+			else /*if (strcmp(tokens[0], "jobs") != 0)*/ {
 				//handle verbose printing
 				if (verb) {
 					printf("\tcommand: %s\n",line);
@@ -274,7 +275,7 @@ int external( int argc, char **argv) {
 	}
 	else {
 		if (status != 0) {
-			printf("command status: %d\n",status);
+			fprintf(stderr, "command status: %d\n", WEXITSTATUS(status));
 		}
 		
 		return status;
@@ -343,3 +344,4 @@ int quit( int argc, char **argv ) {
 	}
 	return 0;
 }
+
